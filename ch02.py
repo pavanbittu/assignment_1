@@ -2,15 +2,29 @@
 
 
 import sys
-from python_environment_check import check_packages
+from packaging.version import Version
+#from python_environment_check import check_packages
 import numpy as np
 import os
 import pandas as pd
 import matplotlib.pyplot as plt
 from matplotlib.colors import ListedColormap
+from urllib.error import HTTPError
+REQUIRED_VERSION = (3, 8) 
+#Get current Python version
+current_version = sys.version_info
 
-# # Machine Learning with PyTorch and Scikit-Learn  
-# # -- Code Examples
+# Compare versions
+if current_version >= REQUIRED_VERSION:
+    print("Python version is sufficient.")
+else:
+    print("Python version is too old.")
+
+
+def get_packages(pkgs):
+ # Example: Python 3.8
+ # # Machine Learning with PyTorch and Scikit-Learn
+ # # -- Code Examples
 
 # ## Package version checks
 
@@ -18,8 +32,16 @@ from matplotlib.colors import ListedColormap
 
 
 
-sys.path.insert(0, '..')
-
+  sys.path.insert(0, '..')
+def check_packages(d, versions):
+    for (pkg_name, suggested_ver), actual_ver in zip(d.items(), versions):
+        if actual_ver == 'N/A':
+            continue
+        actual_ver, suggested_ver = Version(actual_ver), Version(suggested_ver)
+        if pkg_name == "matplotlib" and actual_ver == Version("3.8"):
+            print(f'[FAIL] {pkg_name} {actual_ver}, please upgrade to {suggested_ver} >= matplotlib > 3.8')
+        elif actual_ver < suggested_ver:
+            print(f'[FAIL] {pkg_name} {actual_ver}, please upgrade to >= {suggested_ver}')
 
 # Check recommended package versions:
 
@@ -32,11 +54,20 @@ d = {
     'matplotlib': '3.4.3',
     'pandas': '1.3.2'
 }
-check_packages(d)
+#check_packages(d)
 
 
 # # Chapter 2 - Training Machine Learning Algorithms for Classification
-
+if __name__ == '__main__':
+    # Define the dictionary of suggested versions
+    d = {
+        'numpy': '1.21.2',
+        'scipy': '1.7.0',
+        'matplotlib': '3.4.3',
+        'sklearn': '1.0',
+        'pandas': '1.3.2'
+    }
+#check_packages(d)
 # ### Overview
 # 
 
@@ -135,7 +166,7 @@ class Perceptron:
         """
         rgen = np.random.RandomState(self.random_state)
         self.w_ = rgen.normal(loc=0.0, scale=0.01, size=X.shape[1])
-        self.b_ = np.float_(0.)
+        self.b_ = np.float64(0.)
         
         self.errors_ = []
 
@@ -244,10 +275,9 @@ plt.show()
 
 
 def plot_decision_regions(X, y, classifier, resolution=0.02):
-
     # setup marker generator and color map
     markers = ('o', 's', '^', 'v', '<')
-    colors = ('red', 'blue', 'lightgreen', 'gray', 'cyan')
+    colors = ['#FF0000', '#0000FF', '#90EE90', '#808080', '#00FFFF']  # Hex codes
     cmap = ListedColormap(colors[:len(np.unique(y))])
 
     # plot the decision surface
@@ -266,10 +296,11 @@ def plot_decision_regions(X, y, classifier, resolution=0.02):
         plt.scatter(x=X[y == cl, 0], 
                     y=X[y == cl, 1],
                     alpha=0.8, 
-                    c=colors[idx],
+                    c=[colors[idx]],  # Ensure color is passed as a list
                     marker=markers[idx], 
                     label=f'Class {cl}', 
                     edgecolor='black')
+
 
 
 
@@ -351,7 +382,7 @@ class AdalineGD:
         """
         rgen = np.random.RandomState(self.random_state)
         self.w_ = rgen.normal(loc=0.0, scale=0.01, size=X.shape[1])
-        self.b_ = np.float_(0.)
+        self.b_ = np.float64(0.)
         self.losses_ = []
 
         for i in range(self.n_iter):
@@ -539,7 +570,7 @@ class AdalineSGD:
         """Initialize weights to small random numbers"""
         self.rgen = np.random.RandomState(self.random_state)
         self.w_ = self.rgen.normal(loc=0.0, scale=0.01, size=m)
-        self.b_ = np.float_(0.)
+        self.b_ = np.float64(0.)
         self.w_initialized = True
         
     def _update_weights(self, xi, target):
@@ -576,14 +607,14 @@ plt.ylabel('Petal length [standardized]')
 plt.legend(loc='upper left')
 
 plt.tight_layout()
-plt.savefig('figures/02_15_1.png', dpi=300)
+plt.savefig('figures_1.png', dpi=300)
 plt.show()
 
 plt.plot(range(1, len(ada_sgd.losses_) + 1), ada_sgd.losses_, marker='o')
 plt.xlabel('Epochs')
 plt.ylabel('Average loss')
 
-plt.savefig('figures/02_15_2.png', dpi=300)
+plt.savefig('figures_2.png', dpi=300)
 plt.show()
 
 
